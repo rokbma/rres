@@ -77,6 +77,8 @@ fn main() -> eyre::Result<()> {
 
     // Store found displays
     let mut displays: Vec<Mode> = vec![];
+    // Store GPUs to check
+    let mut cards: Vec<path::PathBuf> = vec![];
 
     if let Some(c) = card {
         // Open single card
@@ -85,12 +87,7 @@ fn main() -> eyre::Result<()> {
         if !file.exists() || !c.starts_with("card") {
             return Err(eyre::eyre!("invalid card ({})", c));
         }
-
-        let gpu = Card::open(file);
-        let info = gpu.get_driver()?;
-        log::info!("Found GPU: {}", info.name().to_string_lossy());
-        // Find displays
-        displays.extend_from_slice(&get_card_modes(gpu)?);
+        cards.push(file);
     } else {
         // Open all GPUs
         for entry in fs::read_dir("/dev/dri/")? {
@@ -98,14 +95,19 @@ fn main() -> eyre::Result<()> {
 
             if let Some(name) = file.file_name().to_str() {
                 if name.starts_with("card") {
-                    let gpu = Card::open(file.path());
-                    let info = gpu.get_driver()?;
-                    log::info!("Found GPU: {}", info.name().to_string_lossy());
-                    // Find displays
-                    displays.extend_from_slice(&get_card_modes(gpu)?);
+                    cards.push(file.path());
                 }
             }
         }
+    }
+
+    // Read GPU list
+    for file in cards {
+        let gpu = Card::open(file);
+        let info = gpu.get_driver()?;
+        log::info!("Found GPU: {}", info.name().to_string_lossy());
+        // Find displays
+        displays.extend_from_slice(&get_card_modes(gpu)?);
     }
 
     if displays.len() < 1 {
