@@ -4,6 +4,7 @@ use std::process;
 
 use drm::control::{Device as ControlDevice, Mode};
 use drm::Device;
+use simple_logger::SimpleLogger;
 
 const USAGE: &'static str = "\
 Usage: rres [options]
@@ -71,9 +72,9 @@ fn main() -> eyre::Result<()> {
     }
 
     // Init logger
-    pretty_env_logger::formatted_builder()
-        .filter_level(verbosity)
-        .init();
+    SimpleLogger::new()
+        .with_level(verbosity)
+        .init()?;
 
     // Store found displays
     let mut displays: Vec<Mode> = vec![];
