@@ -16,7 +16,7 @@ Usage: rres [options]
 
 ";
 
-// GPU handle
+// Card handle
 // Really just to get a raw file descriptor for `drm`
 pub struct Card(std::fs::File);
 
@@ -77,7 +77,7 @@ fn main() -> eyre::Result<()> {
 
     // Store found displays
     let mut displays: Vec<Mode> = vec![];
-    // Store GPUs to check
+    // Store the checked cards
     let mut cards: Vec<path::PathBuf> = vec![];
 
     if let Some(c) = card {
@@ -89,7 +89,7 @@ fn main() -> eyre::Result<()> {
         }
         cards.push(file);
     } else {
-        // Open all GPUs
+        // Open every card on the system
         for entry in fs::read_dir("/dev/dri/")? {
             let file = entry?;
 
@@ -101,7 +101,7 @@ fn main() -> eyre::Result<()> {
         }
     }
 
-    // Read GPU list
+    // Read card list
     for file in cards {
         let gpu = Card::open(file);
         let info = gpu.get_driver()?;
@@ -130,7 +130,7 @@ fn main() -> eyre::Result<()> {
     Ok(())
 }
 
-/// Get all the connected display's modes from a libdrm GPU.
+/// Get all the connected display's modes from a libdrm card.
 pub fn get_card_modes<G: ControlDevice>(gpu: G) -> eyre::Result<Vec<Mode>> {
     let mut modes: Vec<Mode> = vec![];
 
