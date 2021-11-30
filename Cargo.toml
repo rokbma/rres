@@ -13,4 +13,8 @@ drm = { git = "https://github.com/Smithay/drm-rs" }
 eyre = "0.6"
 lexopt = "0.2"
 log = "0.4"
-simple_logger = "1.15"
+
+[dependencies.simple_logger]
+version = "1.15"
+default-features = false
+features = ["stderr", "colors"]
