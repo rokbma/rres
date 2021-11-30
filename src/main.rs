@@ -16,6 +16,8 @@ Usage: rres [options]
 
 ";
 
+// GPU handle
+// Really just to get a raw file descriptor for `drm`
 pub struct Card(std::fs::File);
 
 impl std::os::unix::io::AsRawFd for Card {
@@ -33,15 +35,17 @@ impl Card {
     }
 }
 
+// Implement `drm` types
 impl Device for Card {}
 impl ControlDevice for Card {}
 
 fn main() -> eyre::Result<()> {
+    // Settings
     let mut verbosity = log::LevelFilter::Warn;
-
     let mut multi = false;
     let mut card: Option<String> = None;
 
+    // Handle CLI
     {
         use lexopt::prelude::*;
         let mut parser = lexopt::Parser::from_env();
@@ -66,13 +70,16 @@ fn main() -> eyre::Result<()> {
         }
     }
 
+    // Init logger
     pretty_env_logger::formatted_builder()
         .filter_level(verbosity)
         .init();
 
+    // Store found displays
     let mut displays: Vec<Mode> = vec![];
 
     if let Some(c) = card {
+        // Open single card
         let mut file = path::PathBuf::from("/dev/dri/");
         file.push(&c);
         if !file.exists() || !c.starts_with("card") {
@@ -82,8 +89,10 @@ fn main() -> eyre::Result<()> {
         let gpu = Card::open(file);
         let info = gpu.get_driver()?;
         log::info!("Found GPU: {}", info.name().to_string_lossy());
+        // Find displays
         displays.extend_from_slice(&get_card_modes(gpu)?);
     } else {
+        // Open all GPUs
         for entry in fs::read_dir("/dev/dri/")? {
             let file = entry?;
 
@@ -92,6 +101,7 @@ fn main() -> eyre::Result<()> {
                     let gpu = Card::open(file.path());
                     let info = gpu.get_driver()?;
                     log::info!("Found GPU: {}", info.name().to_string_lossy());
+                    // Find displays
                     displays.extend_from_slice(&get_card_modes(gpu)?);
                 }
             }
@@ -104,11 +114,13 @@ fn main() -> eyre::Result<()> {
     }
 
     if multi {
+        // List every display
         for (i, mode) in displays.iter().enumerate() {
             let res = mode.size();
             println!("Display #{}: {}x{}", i, res.0, res.1);
         }
     } else {
+        // Print res of first display
         let res = displays[0].size();
         println!("{}x{}", res.0, res.1);
     }
@@ -128,10 +140,13 @@ pub fn get_card_modes<G: ControlDevice>(gpu: G) -> eyre::Result<Vec<Mode>> {
     for handle in connectors {
         let connector = gpu.get_connector(*handle)?;
         if connector.state() == drm::control::connector::State::Connected {
+            // Connected
             if let Some(encoder_handle) = connector.current_encoder() {
+                // Get the encoder then crtc
                 let encoder = gpu.get_encoder(encoder_handle)?;
                 if let Some(crtc_handle) = encoder.crtc() {
                     let crtc = gpu.get_crtc(crtc_handle)?;
+                    // Get current mode, and store it
                     if let Some(current_mode) = crtc.mode() {
                         log::info!(
                             "Found display: {:?}, {}x{}",
@@ -147,6 +162,7 @@ pub fn get_card_modes<G: ControlDevice>(gpu: G) -> eyre::Result<Vec<Mode>> {
                     modes.push(connector.modes()[0]);
                 }
             } else {
+                // nVidia GPUs don't expose the encoder (and thus neither the crtc)
                 log::warn!("Could not detect current mode for display {:?},", connector.interface());
                 log::warn!("reading native resolution");
                 modes.push(connector.modes()[0]);
