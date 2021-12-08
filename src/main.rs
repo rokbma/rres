@@ -72,9 +72,7 @@ fn main() -> eyre::Result<()> {
     }
 
     // Init logger
-    SimpleLogger::new()
-        .with_level(verbosity)
-        .init()?;
+    SimpleLogger::new().with_level(verbosity).init()?;
 
     // Store found displays
     let mut displays: Vec<Mode> = vec![];
@@ -151,7 +149,10 @@ pub fn get_card_modes<G: ControlDevice>(gpu: G) -> eyre::Result<Vec<Mode>> {
 ///
 /// Note: nVidia GPUs don't share the current encoder+crtc, so this function will report the
 /// native display's resolution instead of the current resolution.
-fn get_connector_mode<G: ControlDevice>(gpu: &G, connector: drm::control::connector::Info) -> eyre::Result<Mode> {
+fn get_connector_mode<G: ControlDevice>(
+    gpu: &G,
+    connector: drm::control::connector::Info,
+) -> eyre::Result<Mode> {
     if connector.state() != drm::control::connector::State::Connected {
         return Err(eyre::eyre!("Connector is disconnected"));
     }
@@ -167,13 +168,16 @@ fn get_connector_mode<G: ControlDevice>(gpu: &G, connector: drm::control::connec
                     connector.interface(),
                     current_mode.size().0,
                     current_mode.size().1
-                    );
+                );
                 return Ok(current_mode);
             }
         }
     }
     // nVidia GPUs don't expose the encoder (and thus neither the crtc)
-    log::warn!("Could not detect current mode for display {:?},", connector.interface());
+    log::warn!(
+        "Could not detect current mode for display {:?},",
+        connector.interface()
+    );
     log::warn!("reading native resolution");
     return Ok(connector.modes()[0]);
 }
