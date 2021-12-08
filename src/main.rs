@@ -15,6 +15,7 @@ Usage: rres [options]
   -m, --multi\t\tRead all monitors. If this option is ommited, rres will
              \t\treturn the resolution of the first detected monitor
   -v, --verbose\t\tVerbosity level. Can be specified multiple times, e.g. -vv
+  -q, --quiet\t\tLower verbosity level. Opposite to -v
   -h, --help\t\tShow this help message
 
 Environment variables:
@@ -71,6 +72,9 @@ fn main() -> eyre::Result<()> {
                 }
                 Short('v') | Long("verbose") => {
                     verbosity = increment_loglevel(verbosity);
+                }
+                Short('q') | Long("quiet") => {
+                    verbosity = decrement_loglevel(verbosity);
                 }
                 _ => panic!("{}", arg.unexpected()),
             }
@@ -208,5 +212,18 @@ fn increment_loglevel(level: log::LevelFilter) -> log::LevelFilter {
         Info => Debug,
         Debug => Trace,
         Trace => Trace,
+    }
+}
+
+/// Decrease `log::LevelFilter` by one level
+fn decrement_loglevel(level: log::LevelFilter) -> log::LevelFilter {
+    use log::LevelFilter::*;
+    match level {
+        Off => Off,
+        Error => Off,
+        Warn => Error,
+        Info => Warn,
+        Debug => Info,
+        Trace => Debug,
     }
 }
