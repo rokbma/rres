@@ -5,6 +5,7 @@ use std::process;
 
 use drm::control::{Device as ControlDevice, Mode};
 use drm::Device;
+use eyre::WrapErr;
 use simple_logger::SimpleLogger;
 
 const USAGE: &'static str = "\
@@ -131,12 +132,10 @@ fn main() -> eyre::Result<()> {
     } else {
         let selection: usize = env::var("RRES_DISPLAY")
             .unwrap_or("0".to_string())
-            .parse()?;
+            .parse()
+            .wrap_err("Failed to parse RRES_DISPLAY")?;
         if selection > displays.len() - 1 {
-            return Err(eyre::eyre!(
-                "Invalid display: {}",
-                selection
-            ));
+            return Err(eyre::eyre!("Invalid display: {}", selection));
         }
         // Print res of first display
         let res = displays[selection].size();
