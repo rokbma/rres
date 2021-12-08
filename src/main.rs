@@ -105,6 +105,9 @@ fn main() -> eyre::Result<()> {
         }
     }
 
+    // Sort cards (card0, card1, card2...)
+    cards.sort();
+
     // Read card list
     for file in cards {
         let gpu = Card::open(file);
