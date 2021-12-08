@@ -1,3 +1,4 @@
+use std::env;
 use std::fs;
 use std::path;
 use std::process;
@@ -14,6 +15,10 @@ Usage: rres [options]
              \t\treturn the resolution of the first detected monitor
   -v, --verbose\t\tVerbosity level. Can be specified multiple times, e.g. -vv
   -h, --help\t\tShow this help message
+
+Environment variables:
+
+  RRES_DISPLAY=<index>\tSelect display in single mode (starting at 0)
 
 ";
 
@@ -121,8 +126,17 @@ fn main() -> eyre::Result<()> {
             println!("Display #{}: {}x{}", i, res.0, res.1);
         }
     } else {
+        let selection: usize = env::var("RRES_DISPLAY")
+            .unwrap_or("0".to_string())
+            .parse()?;
+        if selection > displays.len() - 1 {
+            return Err(eyre::eyre!(
+                "Invalid display: {}",
+                selection
+            ));
+        }
         // Print res of first display
-        let res = displays[0].size();
+        let res = displays[selection].size();
         println!("{}x{}", res.0, res.1);
     }
 
