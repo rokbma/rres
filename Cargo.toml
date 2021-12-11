@@ -13,7 +13,7 @@ license = "GPL-3.0-or-later"
 lto = true
 
 [dependencies]
-drm = { git = "https://github.com/Smithay/drm-rs" }
+drm = "0.6"
 eyre = "0.6"
 lexopt = "0.2"
 log = "0.4"

@@ -50,9 +50,11 @@ dependencies = [
 
 [[package]]
 name = "drm"
-version = "0.5.0"
-source = "git+https://github.com/Smithay/drm-rs#c9bfebeca9f987e929f8ec171a71d2a1123c4c08"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "65dd8c9adf91fcc57838c5bf6a3967434758a3ae2ec9c9e86199f4d8d93385c7"
 dependencies = [
+ "bitflags",
  "drm-ffi",
  "drm-fourcc",
  "nix",
@@ -60,8 +62,9 @@ dependencies = [
 
 [[package]]
 name = "drm-ffi"
-version = "0.2.0"
-source = "git+https://github.com/Smithay/drm-rs#c9bfebeca9f987e929f8ec171a71d2a1123c4c08"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "198d1b7fdb33b75e9bd08ba6842ddb730760f7eeea25552acc88c5403c4f0652"
 dependencies = [
  "drm-sys",
  "nix",
@@ -75,8 +78,9 @@ checksum = "0aafbcdb8afc29c1a7ee5fbe53b5d62f4565b35a042a662ca9fecd0b54dae6f4"
 
 [[package]]
 name = "drm-sys"
-version = "0.1.1"
-source = "git+https://github.com/Smithay/drm-rs#c9bfebeca9f987e929f8ec171a71d2a1123c4c08"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f5f45fcdd3b2f3c13fadea11b2a4eda2023e7de55021da039eac4a3beecfe91c"
 dependencies = [
  "libc",
 ]
@@ -120,9 +124,9 @@ checksum = "de7513aea7d10dc0694d719ac53de3b74f1600e41b9f81ed9f395d8ec36a2a70"
 
 [[package]]
 name = "libc"
-version = "0.2.108"
+version = "0.2.111"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8521a1b57e76b1ec69af7599e75e38e7b7fad6610f037db8c79b127201b5d119"
+checksum = "8e167738f1866a7ec625567bae89ca0d44477232a4f7c52b1c7f2adc2c98804f"
 
 [[package]]
 name = "log"
@@ -135,9 +139,9 @@ dependencies = [
 
 [[package]]
 name = "memoffset"
-version = "0.6.4"
+version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "59accc507f1338036a0477ef61afdae33cde60840f4dfe481319ce3ad116ddf9"
+checksum = "5aa361d4faea93603064a027415f07bd8e1d5c88c9fbf68bf56a285428fd79ce"
 dependencies = [
  "autocfg",
 ]
@@ -174,9 +178,9 @@ dependencies = [
 
 [[package]]
 name = "simple_logger"
-version = "1.15.0"
+version = "1.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "205596cf77a15774e5601c5ef759f4211ac381c0855a1f1d5e24a46f60f93e9a"
+checksum = "12413e3c006deb4f16b9f43192d419c462e21134d0a4e63532fbd050f546a561"
 dependencies = [
  "atty",
  "colored",
