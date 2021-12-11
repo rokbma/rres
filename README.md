@@ -27,6 +27,10 @@ Environment variables:
 
 ```
 
+## Changelog
+
+All notable changes will be documented in the [CHANGELOG](./CHANGELOG.md)
+
 ## Contributing
 
 Please speak with me in [Matrix](https://matrix.to/#/!SlYhhmreXjJylcsjfn:tedomum.net?via=matrix.org&via=tedomum.net) before sending PRs.
