@@ -25,7 +25,7 @@ use drm::Device;
 use eyre::WrapErr;
 use simple_logger::SimpleLogger;
 
-const USAGE: &'static str = "\
+const USAGE: &str = "\
 Usage: rres [options]
 
   -c, --card <card>\tSpecify a GPU (file existing in /dev/dri/, eg. card0)
@@ -139,7 +139,7 @@ fn main() -> eyre::Result<()> {
         displays.extend_from_slice(&get_card_modes(gpu)?);
     }
 
-    if displays.len() < 1 {
+    if displays.is_empty() {
         log::error!("Found no display connected!");
         process::exit(1);
     }
@@ -152,7 +152,7 @@ fn main() -> eyre::Result<()> {
         }
     } else {
         let selection: usize = env::var("RRES_DISPLAY")
-            .unwrap_or("0".to_string())
+            .unwrap_or_else(|_| "0".to_string())
             .parse()
             .wrap_err("Failed to parse RRES_DISPLAY")?;
         if selection > displays.len() - 1 {
