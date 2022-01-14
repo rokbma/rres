@@ -39,6 +39,10 @@ Environment variables:
 
   RRES_DISPLAY=<index>\tSelect display in single mode (starting at 0)
 
+Wine Virtual Desktop example:
+
+  wine \"explorer /desktop=Game,$(./rres)\" game.exe
+
 ";
 
 // Card handle
