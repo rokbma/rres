@@ -23,8 +23,12 @@ Usage: rres [options]
 
 Environment variables:
 
-  RRES_DISPLAY=<index>	Select display in single mode (starting at 0)
+  RRES_DISPLAY=<index>		Select display in single mode (starting at 0)
+  RRES_FORCE_RES=RESXxRESY	Force a specific resolution to be detected
 
+Wine Virtual Desktop example:
+
+  wine "explorer /desktop=Game,$(./rres)" game.exe
 ```
 
 ## Changelog
