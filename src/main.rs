@@ -97,7 +97,7 @@ fn main() -> eyre::Result<()> {
                 Short('q') | Long("quiet") => {
                     verbosity = decrement_loglevel(verbosity);
                 }
-                _ => panic!("{}", arg.unexpected()),
+                _ => return Err(eyre::eyre!("{}", arg.unexpected())),
             }
         }
     }
@@ -140,11 +140,14 @@ fn main() -> eyre::Result<()> {
         let info = gpu.get_driver()?;
         log::info!("Found GPU: {}", info.name().to_string_lossy());
         // Find displays
-        displays.extend_from_slice(&get_card_modes(gpu)?);
+        match get_card_modes(gpu) {
+            Ok(modes) => displays.extend_from_slice(&modes),
+            Err(e) => log::error!("failed to read modes: {}", e),
+        }
     }
 
     if displays.is_empty() {
-        log::error!("Found no display connected!");
+        log::error!("found no display connected!");
         process::exit(1);
     }
 
@@ -160,7 +163,7 @@ fn main() -> eyre::Result<()> {
             .parse()
             .wrap_err("Failed to parse RRES_DISPLAY")?;
         if selection > displays.len() - 1 {
-            return Err(eyre::eyre!("Invalid display: {}", selection));
+            return Err(eyre::eyre!("invalid display: {}", selection));
         }
         // Print res of first display
         let res = displays[selection].size();
@@ -174,10 +177,10 @@ fn main() -> eyre::Result<()> {
 pub fn get_card_modes<G: ControlDevice>(gpu: G) -> eyre::Result<Vec<Mode>> {
     let mut modes: Vec<Mode> = vec![];
 
-    let resources = gpu.resource_handles()?;
+    let resources = gpu.resource_handles().wrap_err("failed to get resource handles")?;
     let connectors = resources.connectors();
     for handle in connectors {
-        let connector = gpu.get_connector(*handle)?;
+        let connector = gpu.get_connector(*handle).wrap_err("failed to get connector handle")?;
         if connector.state() == drm::control::connector::State::Connected {
             // Connected, get mode
             modes.push(get_connector_mode(&gpu, connector)?);
@@ -201,7 +204,7 @@ fn get_connector_mode<G: ControlDevice>(
         // Get the encoder then crtc
         let encoder = gpu.get_encoder(encoder_handle)?;
         if let Some(crtc_handle) = encoder.crtc() {
-            let crtc = gpu.get_crtc(crtc_handle)?;
+            let crtc = gpu.get_crtc(crtc_handle).wrap_err("failed to get crtc")?;
             // Get current mode, and store it
             if let Some(current_mode) = crtc.mode() {
                 log::info!(
