@@ -37,13 +37,12 @@ Usage: rres [options]
 
 Environment variables:
 
-  RRES_DISPLAY=<index>\tSelect display in single mode (starting at 0)
+  RRES_DISPLAY=<index>\t\tSelect display in single mode (starting at 0)
+  RRES_FORCE_RES=RESXxRESY\tForce a specific resolution to be detected
 
 Wine Virtual Desktop example:
 
-  wine \"explorer /desktop=Game,$(./rres)\" game.exe
-
-";
+  wine \"explorer /desktop=Game,$(./rres)\" game.exe";
 
 // Card handle
 // Really just to get a raw file descriptor for `drm`
@@ -99,6 +98,16 @@ fn main() -> eyre::Result<()> {
                 }
                 _ => return Err(eyre::eyre!("{}", arg.unexpected())),
             }
+        }
+    }
+
+    if let Ok(forced) = env::var("RRES_FORCE_RES") {
+        if let Some((x, y)) = forced.split_once('x') {
+            println!("{}x{}", x, y);
+            return Ok(());
+        } else {
+            log::error!("failed to parse RRES_FORCE_RES");
+            process::exit(1);
         }
     }
 
