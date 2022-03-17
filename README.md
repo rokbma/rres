@@ -1,3 +1,6 @@
+# DEPRECATED
+I no longer have time or motivation to continue developing rres. It will live under a new owner at https://gitlab.com/forkbomb9/rres
+
 # rres
 
 > A xrandr replacement to gather display resolutions
